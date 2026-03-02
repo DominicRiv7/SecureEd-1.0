@@ -44,6 +44,37 @@ try {
         $error = true;
 
     }
+    
+    //Input validation to confirm usdername is a valid email address in the format of username@domian.com
+    if (!filter_var($my_username, FILTER_VALIDATE_EMAIL)) {
+        header("Location: ../public/index.php?login=fail&reason=invalidemail");
+        exit();
+    }
+
+    //Input validation to confirm that password is between length of 8 to 16 and consists of characters a-z, A-Z, and 0-9 with at least one capital and number
+    if (strlen($mypassword) < 8 || strlen($mypassword) > 16) {
+        header("Location: ..//public/index.php?login=fail&reason=invalidpassword");
+        exit();
+    }//between 8 and 16 char
+
+    if (!preg_match('/[A-Z]/', $mypassword)) {
+        header("Location: ..//public/index.php?login=fail&reason=invalidpassword");
+        exit();
+    } //AT least on capital
+
+    if (!preg_match('/[0-9]', $mypassword)) {
+        header("Location: ..//public/index.php?login=fail&reason=invalidpassword");
+        exit();
+    } //At least 1 number
+
+    if (!preg_match('/^[a-zA-Z0-9]+$/', $mypassword)) {
+        header("Location: ..//public/index.php?login=fail&reason=invalidpassword");
+        exit();
+    } //Only alphanumneric char
+
+
+
+
 
     //determine if an account that met the credentials was found
     if ($count >= 1 && !$error) {
