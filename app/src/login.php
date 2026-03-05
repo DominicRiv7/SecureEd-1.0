@@ -7,6 +7,7 @@ try {
     $myusername = $_POST['username'];
     $mypassword = $_POST['password'];
 
+    //Make sure both fields are not blank
     if($myusername==null || $mypassword==null) {
     {throw new Exception("input did not exist");}
 
