@@ -8,7 +8,7 @@ try {
     $mypassword = $_POST['password'];
 
     //Make sure both fields are not blank
-    if($myusername==null || $mypassword==null) {
+    if($myusername==null || $mypassword==null)
     {throw new Exception("input did not exist");}
 
      //Input validation to confirm usdername is a valid email address in the format of username@domian.com
@@ -18,6 +18,11 @@ try {
     }
 
     //Input validation to confirm that password is between length of 8 to 16 and consists of characters a-z, A-Z, and 0-9 with at least one capital and number
+    if (!preg_match('/^[a-zA-Z0-9]+$/', $mypassword)) {
+        header("Location: ../public/index.php?login=fail&reason=invalidpassword");
+        exit();
+    } //Only alphanumneric char
+    
     if (strlen($mypassword) < 8 || strlen($mypassword) > 16) {
         header("Location: ../public/index.php?login=fail&reason=invalidpassword");
         exit();
@@ -33,16 +38,11 @@ try {
         exit();
     } //At least 1 number
 
-    if (!preg_match('/^[a-zA-Z0-9]+$/', $mypassword)) {
-        header("Location: ../public/index.php?login=fail&reason=invalidpassword");
-        exit();
-    } //Only alphanumneric char
-
     //convert password to 80 byte hash using ripemd256 before comparing
     $hashpassword = hash('ripemd256', $mypassword);
 
     $myusername = strtolower($myusername); //makes username noncase-sensitive
-    global $acctype;
+    
 
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
