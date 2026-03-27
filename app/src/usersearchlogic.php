@@ -92,6 +92,9 @@ try {
     global $jsonArray;
 
     while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+        $sanitizedRow = array_map(function($value) {
+            return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); // Sanitize fields in the row before output to prevent XSS
+        }, $row);
         $jsonArray[] = $row;
     }
 
@@ -99,18 +102,10 @@ try {
 }
 catch(Exception $e)
 {
-    //prepare page for content
-    include_once "ErrorHeader.php";
-
-    //Display error information
-    echo 'Caught exception: ',  $e->getMessage(), "<br>";
-    var_dump($e->getTraceAsString());
-    echo 'in '.'http://'. $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']."<br>";
-
-    $allVars = get_defined_vars();
-    debug_zval_dump($allVars);
+    http_response_code(500); //Provide a generic error message to avoid leaking server/debug information
+    echo json_encode(['error' => "An unexpected error occured. Please try again later."]);
 }
 
 
 //note: since no changes happen to the database, it is not backed up on this page
-?>
+?> 

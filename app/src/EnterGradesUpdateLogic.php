@@ -11,6 +11,33 @@ try {
         $filename = $_FILES['file']['name'];
         $filetmp  = $_FILES['file']['tmp_name'];
 
+        // Input Validation
+            // Ensure file was actually uploaded 
+            if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("File upload failed.");
+            }
+            //Validate file extension, only .csv
+            $path = pathinfo($filename);
+            if (!isset($path['extension']) || strtolower($path['extension']) !== 'csv') {
+                throw new Exception("Invalid file type. Only CSV files are accepted.");
+            }
+            //Validate MIME type
+            $allowedMimeTypes = ['text/plain', 'text/csv', 'application/csv', 'application/vnd.ms-excel'];
+            $mimeType = mime_content_type($filetmp);
+            if (!in_array($mimeType, $allowedMimeTypes, true )) {
+                throw new Exception("Invalid file content type.");
+            }
+            //Validate size 
+            $maxFileSizeBytes = 1 * 1024 * 1024;
+            if ($_FILES['file']['size'] > $maxFileSizeBytes) {
+                throw new Exception("File exceeds maximum allwed size of 1 MB");
+            }
+            //Validate CRN
+            $crn = $_POST['crn'];
+            if (!isset($crn) || !ctype_digit(strval($crn))) {
+                throw new Exception("Invalid CRN value.");
+            }
+
         //create the upload path with the original filename
         $uploadPath = $currentDirectory . $uploadDirectory . basename($filename);
 
