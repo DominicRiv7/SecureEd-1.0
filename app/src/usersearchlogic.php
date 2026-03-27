@@ -95,7 +95,7 @@ try {
         $sanitizedRow = array_map(function($value) {
             return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); // Sanitize fields in the row before output to prevent XSS
         }, $row);
-        $jsonArray[] = $row;
+        $jsonArray[] = $sanitizedRow;
     }
 
     echo json_encode($jsonArray);

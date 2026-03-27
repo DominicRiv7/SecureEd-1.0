@@ -52,9 +52,15 @@ try {
         //insert data into the database if csv
         if($path['extension'] == 'csv') { //check if file is .csv
             while (($data = fgetcsv($handle, 9001, ",")) !== FALSE) { //iterate through csv
-                $crn = $db->escapeString($crn); //sanitize the crn
-                $query = "INSERT INTO Grade VALUES ('$crn', '$data[0]', '$data[1]')";//create query for db
-                $db->exec($query);
+                if (count($data) < 2) {
+                    continue;
+                }
+                $query = "INSERT INTO Grade VALUES (:crn, :col0, :col1)";
+                $stmt = $db->prepare($query);
+                $stmt->bindValue(':crn', $crn, SQLITE3_INTEGER);
+                $stmt->bindValue(':col0', $data[0], SQLITE3_TEXT);
+                $stmt->bindValue(':col1', $data[1], SQLITE3_TEXT);
+                $stmt->execute();
             }
 
             $db->backup($db, "temp", $GLOBALS['dbPath']);
@@ -67,14 +73,8 @@ try {
 }
 catch(Exception $e)
 {
-    //prepare page for content
+    http_response_code(400);
     include_once "ErrorHeader.php";
-
-    //Display error information
-    echo 'Caught exception: ',  $e->getMessage(), "<br>";
-    var_dump($e->getTraceAsString());
-    echo 'in '.'http://'. $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']."<br>";
-
-    $allVars = get_defined_vars();
-    debug_zval_dump($allVars);
+    echo 'An error occured while processing your request. Please try again.';
 }
+?>
